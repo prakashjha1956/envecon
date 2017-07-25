@@ -1,3 +1,4 @@
+@inject('request', 'Illuminate\Http\Request')
 @extends('layouts.app')
 
 @section('content')
@@ -8,6 +9,8 @@
         
     </p>
     @endcan
+
+    
 
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -23,7 +26,8 @@
                         @endcan
 
                         <th>@lang('quickadmin.time-work-types.fields.name')</th>
-                        <th>&nbsp;</th>
+                                                <th>&nbsp;</th>
+
                     </tr>
                 </thead>
                 
@@ -35,8 +39,8 @@
                                     <td></td>
                                 @endcan
 
-                                <td>{{ $time_work_type->name }}</td>
-                                <td>
+                                <td field-key='name'>{{ $time_work_type->name }}</td>
+                                                                <td>
                                     @can('time_work_type_view')
                                     <a href="{{ route('admin.time_work_types.show',[$time_work_type->id]) }}" class="btn btn-xs btn-primary">@lang('quickadmin.qa_view')</a>
                                     @endcan
@@ -44,7 +48,7 @@
                                     <a href="{{ route('admin.time_work_types.edit',[$time_work_type->id]) }}" class="btn btn-xs btn-info">@lang('quickadmin.qa_edit')</a>
                                     @endcan
                                     @can('time_work_type_delete')
-                                    {!! Form::open(array(
+{!! Form::open(array(
                                         'style' => 'display: inline-block;',
                                         'method' => 'DELETE',
                                         'onsubmit' => "return confirm('".trans("quickadmin.qa_are_you_sure")."');",
@@ -53,6 +57,7 @@
                                     {!! Form::close() !!}
                                     @endcan
                                 </td>
+
                             </tr>
                         @endforeach
                     @else

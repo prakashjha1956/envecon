@@ -14,7 +14,7 @@
                     <table class="table table-bordered table-striped">
                         <tr>
                             <th>@lang('quickadmin.time-projects.fields.name')</th>
-                            <td>{{ $time_project->name }}</td>
+                            <td field-key='name'>{{ $time_project->name }}</td>
                         </tr>
                     </table>
                 </div>
@@ -39,7 +39,14 @@
                         <th>@lang('quickadmin.request-to-technical.fields.small-description')</th>
                         <th>@lang('quickadmin.request-to-technical.fields.upload-customer-sign-off-files')</th>
                         <th>@lang('quickadmin.request-to-technical.fields.assigned-person')</th>
+                        <th>@lang('quickadmin.request-to-technical.fields.name')</th>
+                        <th>@lang('quickadmin.status.fields.name')</th>
+                        <th>@lang('quickadmin.status.fields.description')</th>
+                        @if( request('show_deleted') == 1 )
                         <th>&nbsp;</th>
+                        @else
+                        <th>&nbsp;</th>
+                        @endif
         </tr>
     </thead>
 
@@ -47,21 +54,46 @@
         @if (count($request_to_technicals) > 0)
             @foreach ($request_to_technicals as $request_to_technical)
                 <tr data-entry-id="{{ $request_to_technical->id }}">
-                    <td>{{ $request_to_technical->project->name or '' }}</td>
-                                <td>{{ $request_to_technical->work_type->name or '' }}</td>
-                                <td>{{ $request_to_technical->priority }}</td>
-                                <td>{{ $request_to_technical->request_name }}</td>
-                                <td>{!! $request_to_technical->small_description !!}</td>
-                                <td> @foreach($request_to_technical->getMedia('upload_customer_sign_off_files') as $media)
+                    <td field-key='project'>{{ $request_to_technical->project->name or '' }}</td>
+                                <td field-key='work_type'>{{ $request_to_technical->work_type->name or '' }}</td>
+                                <td field-key='priority'>{{ $request_to_technical->priority }}</td>
+                                <td field-key='request_name'>{{ $request_to_technical->request_name }}</td>
+                                <td field-key='small_description'>{!! $request_to_technical->small_description !!}</td>
+                                <td field-key='upload_customer_sign_off_files'> @foreach($request_to_technical->getMedia('upload_customer_sign_off_files') as $media)
                                 <p class="form-group">
                                     <a href="{{ $media->getUrl() }}" target="_blank">{{ $media->name }} ({{ $media->size }} KB)</a>
                                 </p>
                             @endforeach</td>
-                                <td>
+                                <td field-key='assigned_person'>
                                     @foreach ($request_to_technical->assigned_person as $singleAssignedPerson)
                                         <span class="label label-info label-many">{{ $singleAssignedPerson->name }}</span>
                                     @endforeach
                                 </td>
+                                <td field-key='name'>{{ $request_to_technical->name->name or '' }}</td>
+<td field-key='name'>{{ isset($request_to_technical->name) ? $request_to_technical->name->name : '' }}</td>
+<td field-key='description'>{{ isset($request_to_technical->name) ? $request_to_technical->name->description : '' }}</td>
+                                @if( request('show_deleted') == 1 )
+                                <td>
+                                    @can('request_to_technical_delete')
+                                                                        {!! Form::open(array(
+                                        'style' => 'display: inline-block;',
+                                        'method' => 'POST',
+                                        'onsubmit' => "return confirm('".trans("quickadmin.qa_are_you_sure")."');",
+                                        'route' => ['admin.request_to_technicals.restore', $request_to_technical->id])) !!}
+                                    {!! Form::submit(trans('quickadmin.qa_restore'), array('class' => 'btn btn-xs btn-success')) !!}
+                                    {!! Form::close() !!}
+                                @endcan
+                                    @can('request_to_technical_delete')
+                                                                        {!! Form::open(array(
+                                        'style' => 'display: inline-block;',
+                                        'method' => 'DELETE',
+                                        'onsubmit' => "return confirm('".trans("quickadmin.qa_are_you_sure")."');",
+                                        'route' => ['admin.request_to_technicals.perma_del', $request_to_technical->id])) !!}
+                                    {!! Form::submit(trans('quickadmin.qa_permadel'), array('class' => 'btn btn-xs btn-danger')) !!}
+                                    {!! Form::close() !!}
+                                @endcan
+                                </td>
+                                @else
                                 <td>
                                     @can('request_to_technical_view')
                                     <a href="{{ route('admin.request_to_technicals.show',[$request_to_technical->id]) }}" class="btn btn-xs btn-primary">@lang('quickadmin.qa_view')</a>
@@ -70,7 +102,7 @@
                                     <a href="{{ route('admin.request_to_technicals.edit',[$request_to_technical->id]) }}" class="btn btn-xs btn-info">@lang('quickadmin.qa_edit')</a>
                                     @endcan
                                     @can('request_to_technical_delete')
-                                    {!! Form::open(array(
+{!! Form::open(array(
                                         'style' => 'display: inline-block;',
                                         'method' => 'DELETE',
                                         'onsubmit' => "return confirm('".trans("quickadmin.qa_are_you_sure")."');",
@@ -79,11 +111,12 @@
                                     {!! Form::close() !!}
                                     @endcan
                                 </td>
+                                @endif
                 </tr>
             @endforeach
         @else
             <tr>
-                <td colspan="11">@lang('quickadmin.qa_no_entries_in_table')</td>
+                <td colspan="12">@lang('quickadmin.qa_no_entries_in_table')</td>
             </tr>
         @endif
     </tbody>
@@ -97,7 +130,8 @@
                         <th>@lang('quickadmin.time-entries.fields.project')</th>
                         <th>@lang('quickadmin.time-entries.fields.start-time')</th>
                         <th>@lang('quickadmin.time-entries.fields.end-time')</th>
-                        <th>&nbsp;</th>
+                                                <th>&nbsp;</th>
+
         </tr>
     </thead>
 
@@ -105,11 +139,11 @@
         @if (count($time_entries) > 0)
             @foreach ($time_entries as $time_entry)
                 <tr data-entry-id="{{ $time_entry->id }}">
-                    <td>{{ $time_entry->work_type->name or '' }}</td>
-                                <td>{{ $time_entry->project->name or '' }}</td>
-                                <td>{{ $time_entry->start_time }}</td>
-                                <td>{{ $time_entry->end_time }}</td>
-                                <td>
+                    <td field-key='work_type'>{{ $time_entry->work_type->name or '' }}</td>
+                                <td field-key='project'>{{ $time_entry->project->name or '' }}</td>
+                                <td field-key='start_time'>{{ $time_entry->start_time }}</td>
+                                <td field-key='end_time'>{{ $time_entry->end_time }}</td>
+                                                                <td>
                                     @can('time_entry_view')
                                     <a href="{{ route('admin.time_entries.show',[$time_entry->id]) }}" class="btn btn-xs btn-primary">@lang('quickadmin.qa_view')</a>
                                     @endcan
@@ -117,7 +151,7 @@
                                     <a href="{{ route('admin.time_entries.edit',[$time_entry->id]) }}" class="btn btn-xs btn-info">@lang('quickadmin.qa_edit')</a>
                                     @endcan
                                     @can('time_entry_delete')
-                                    {!! Form::open(array(
+{!! Form::open(array(
                                         'style' => 'display: inline-block;',
                                         'method' => 'DELETE',
                                         'onsubmit' => "return confirm('".trans("quickadmin.qa_are_you_sure")."');",
@@ -126,6 +160,7 @@
                                     {!! Form::close() !!}
                                     @endcan
                                 </td>
+
                 </tr>
             @endforeach
         @else

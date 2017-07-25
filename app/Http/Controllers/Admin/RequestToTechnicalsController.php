@@ -26,7 +26,15 @@ class RequestToTechnicalsController extends Controller
             return abort(401);
         }
 
-        $request_to_technicals = RequestToTechnical::all();
+
+        if (request('show_deleted') == 1) {
+            if (! Gate::allows('request_to_technical_delete')) {
+                return abort(401);
+            }
+            $request_to_technicals = RequestToTechnical::onlyTrashed()->get();
+        } else {
+            $request_to_technicals = RequestToTechnical::all();
+        }
 
         return view('admin.request_to_technicals.index', compact('request_to_technicals'));
     }
@@ -41,14 +49,10 @@ class RequestToTechnicalsController extends Controller
         if (! Gate::allows('request_to_technical_create')) {
             return abort(401);
         }
-        $relations = [
-            'projects' => \App\TimeProject::get()->pluck('name', 'id')->prepend('Please select', ''),
-            'work_types' => \App\TimeWorkType::get()->pluck('name', 'id')->prepend('Please select', ''),
-            'assigned_people' => \App\User::get()->pluck('name', 'id'),
-        ];
+        $projects = \App\TimeProject::get()->pluck('name', 'id')->prepend('Please select', '');$work_types = \App\TimeWorkType::get()->pluck('name', 'id')->prepend('Please select', '');$assigned_people = \App\User::get()->pluck('name', 'id');$names = \App\Status::get()->pluck('name', 'id')->prepend('Please select', '');
         $enum_priority = RequestToTechnical::$enum_priority;
             
-        return view('admin.request_to_technicals.create', compact('enum_priority') + $relations);
+        return view('admin.request_to_technicals.create', compact('enum_priority', 'projects', 'work_types', 'assigned_people', 'names'));
     }
 
     /**
@@ -89,16 +93,12 @@ class RequestToTechnicalsController extends Controller
         if (! Gate::allows('request_to_technical_edit')) {
             return abort(401);
         }
-        $relations = [
-            'projects' => \App\TimeProject::get()->pluck('name', 'id')->prepend('Please select', ''),
-            'work_types' => \App\TimeWorkType::get()->pluck('name', 'id')->prepend('Please select', ''),
-            'assigned_people' => \App\User::get()->pluck('name', 'id'),
-        ];
+        $projects = \App\TimeProject::get()->pluck('name', 'id')->prepend('Please select', '');$work_types = \App\TimeWorkType::get()->pluck('name', 'id')->prepend('Please select', '');$assigned_people = \App\User::get()->pluck('name', 'id');$names = \App\Status::get()->pluck('name', 'id')->prepend('Please select', '');
         $enum_priority = RequestToTechnical::$enum_priority;
             
         $request_to_technical = RequestToTechnical::findOrFail($id);
 
-        return view('admin.request_to_technicals.edit', compact('request_to_technical', 'enum_priority') + $relations);
+        return view('admin.request_to_technicals.edit', compact('request_to_technical', 'enum_priority', 'projects', 'work_types', 'assigned_people', 'names'));
     }
 
     /**
@@ -144,15 +144,9 @@ class RequestToTechnicalsController extends Controller
         if (! Gate::allows('request_to_technical_view')) {
             return abort(401);
         }
-        $relations = [
-            'projects' => \App\TimeProject::get()->pluck('name', 'id')->prepend('Please select', ''),
-            'work_types' => \App\TimeWorkType::get()->pluck('name', 'id')->prepend('Please select', ''),
-            'assigned_people' => \App\User::get()->pluck('name', 'id'),
-        ];
-
         $request_to_technical = RequestToTechnical::findOrFail($id);
 
-        return view('admin.request_to_technicals.show', compact('request_to_technical') + $relations);
+        return view('admin.request_to_technicals.show', compact('request_to_technical'));
     }
 
 
@@ -192,4 +186,38 @@ class RequestToTechnicalsController extends Controller
         }
     }
 
+
+    /**
+     * Restore RequestToTechnical from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function restore($id)
+    {
+        if (! Gate::allows('request_to_technical_delete')) {
+            return abort(401);
+        }
+        $request_to_technical = RequestToTechnical::onlyTrashed()->findOrFail($id);
+        $request_to_technical->restore();
+
+        return redirect()->route('admin.request_to_technicals.index');
+    }
+
+    /**
+     * Permanently delete RequestToTechnical from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function perma_del($id)
+    {
+        if (! Gate::allows('request_to_technical_delete')) {
+            return abort(401);
+        }
+        $request_to_technical = RequestToTechnical::onlyTrashed()->findOrFail($id);
+        $request_to_technical->forceDelete();
+
+        return redirect()->route('admin.request_to_technicals.index');
+    }
 }

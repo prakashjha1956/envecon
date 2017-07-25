@@ -113,6 +113,18 @@
                     @endif
                 </div>
             </div>
+            <div class="row">
+                <div class="col-xs-12 form-group">
+                    {!! Form::label('name_id', 'Name', ['class' => 'control-label']) !!}
+                    {!! Form::select('name_id', $names, old('name_id'), ['class' => 'form-control select2']) !!}
+                    <p class="help-block"></p>
+                    @if($errors->has('name_id'))
+                        <p class="help-block">
+                            {{ $errors->first('name_id') }}
+                        </p>
+                    @endif
+                </div>
+            </div>
             
         </div>
     </div>

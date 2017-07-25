@@ -16,12 +16,13 @@ use Spatie\MediaLibrary\HasMedia\Interfaces\HasMedia;
  * @property string $request_name
  * @property text $small_description
  * @property string $upload_customer_sign_off_files
+ * @property string $name
 */
 class RequestToTechnical extends Model implements HasMedia
 {
     use SoftDeletes, HasMediaTrait;
 
-    protected $fillable = ['priority', 'request_name', 'small_description', 'upload_customer_sign_off_files', 'project_id', 'work_type_id'];
+    protected $fillable = ['priority', 'request_name', 'small_description', 'upload_customer_sign_off_files', 'project_id', 'work_type_id', 'name_id'];
     
     public static function boot()
     {
@@ -49,6 +50,15 @@ class RequestToTechnical extends Model implements HasMedia
     {
         $this->attributes['work_type_id'] = $input ? $input : null;
     }
+
+    /**
+     * Set to null if empty
+     * @param $input
+     */
+    public function setNameIdAttribute($input)
+    {
+        $this->attributes['name_id'] = $input ? $input : null;
+    }
     
     public function project()
     {
@@ -63,6 +73,11 @@ class RequestToTechnical extends Model implements HasMedia
     public function assigned_person()
     {
         return $this->belongsToMany(User::class, 'request_to_technical_user');
+    }
+    
+    public function name()
+    {
+        return $this->belongsTo(Status::class, 'name_id')->withTrashed();
     }
     
 }

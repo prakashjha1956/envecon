@@ -24,7 +24,7 @@ class RequestToTechnicalsController extends Controller
         return RequestToTechnical::findOrFail($id);
     }
 
-    public function update(Admin\UpdateRequestToTechnicalsRequest $request, $id)
+    public function update(UpdateRequestToTechnicalsRequest $request, $id)
     {
         $request = $this->saveFiles($request);
         $request_to_technical = RequestToTechnical::findOrFail($id);
@@ -34,7 +34,7 @@ class RequestToTechnicalsController extends Controller
         return $request_to_technical;
     }
 
-    public function store(Admin\StoreRequestToTechnicalsRequest $request)
+    public function store(StoreRequestToTechnicalsRequest $request)
     {
         $request = $this->saveFiles($request);
         $request_to_technical = RequestToTechnical::create($request->all());

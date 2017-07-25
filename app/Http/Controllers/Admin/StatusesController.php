@@ -142,9 +142,11 @@ class StatusesController extends Controller
         if (! Gate::allows('status_view')) {
             return abort(401);
         }
+        $request_to_technicals = \App\RequestToTechnical::where('name_id', $id)->get();
+
         $status = Status::findOrFail($id);
 
-        return view('admin.statuses.show', compact('status'));
+        return view('admin.statuses.show', compact('status', 'request_to_technicals'));
     }
 
 

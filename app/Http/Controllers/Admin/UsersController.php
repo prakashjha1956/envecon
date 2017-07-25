@@ -23,7 +23,8 @@ class UsersController extends Controller
             return abort(401);
         }
 
-        $users = User::all();
+
+                $users = User::all();
 
         return view('admin.users.index', compact('users'));
     }
@@ -38,11 +39,9 @@ class UsersController extends Controller
         if (! Gate::allows('user_create')) {
             return abort(401);
         }
-        $relations = [
-            'roles' => \App\Role::get()->pluck('title', 'id')->prepend('Please select', ''),
-        ];
+        $roles = \App\Role::get()->pluck('title', 'id')->prepend('Please select', '');
 
-        return view('admin.users.create', $relations);
+        return view('admin.users.create', compact('roles'));
     }
 
     /**
@@ -75,13 +74,11 @@ class UsersController extends Controller
         if (! Gate::allows('user_edit')) {
             return abort(401);
         }
-        $relations = [
-            'roles' => \App\Role::get()->pluck('title', 'id')->prepend('Please select', ''),
-        ];
+        $roles = \App\Role::get()->pluck('title', 'id')->prepend('Please select', '');
 
         $user = User::findOrFail($id);
 
-        return view('admin.users.edit', compact('user') + $relations);
+        return view('admin.users.edit', compact('user', 'roles'));
     }
 
     /**
@@ -116,18 +113,14 @@ class UsersController extends Controller
         if (! Gate::allows('user_view')) {
             return abort(401);
         }
-        $relations = [
-            'roles' => \App\Role::get()->pluck('title', 'id')->prepend('Please select', ''),
-            'user_actions' => \App\UserAction::where('user_id', $id)->get(),
-            'request_to_technicals' => \App\RequestToTechnical::whereHas('assigned_person',
+        $roles = \App\Role::get()->pluck('title', 'id')->prepend('Please select', '');$user_actions = \App\UserAction::where('user_id', $id)->get();$request_to_technicals = \App\RequestToTechnical::whereHas('assigned_person',
                     function ($query) use ($id) {
                         $query->where('id', $id);
-                    })->get(),
-        ];
+                    })->get();
 
         $user = User::findOrFail($id);
 
-        return view('admin.users.show', compact('user') + $relations);
+        return view('admin.users.show', compact('user', 'user_actions', 'request_to_technicals'));
     }
 
 

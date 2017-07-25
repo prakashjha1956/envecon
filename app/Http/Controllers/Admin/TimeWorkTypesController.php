@@ -23,7 +23,8 @@ class TimeWorkTypesController extends Controller
             return abort(401);
         }
 
-        $time_work_types = TimeWorkType::all();
+
+                $time_work_types = TimeWorkType::all();
 
         return view('admin.time_work_types.index', compact('time_work_types'));
     }
@@ -108,14 +109,11 @@ class TimeWorkTypesController extends Controller
         if (! Gate::allows('time_work_type_view')) {
             return abort(401);
         }
-        $relations = [
-            'time_entries' => \App\TimeEntry::where('work_type_id', $id)->get(),
-            'request_to_technicals' => \App\RequestToTechnical::where('work_type_id', $id)->get(),
-        ];
+        $time_entries = \App\TimeEntry::where('work_type_id', $id)->get();$request_to_technicals = \App\RequestToTechnical::where('work_type_id', $id)->get();
 
         $time_work_type = TimeWorkType::findOrFail($id);
 
-        return view('admin.time_work_types.show', compact('time_work_type') + $relations);
+        return view('admin.time_work_types.show', compact('time_work_type', 'time_entries', 'request_to_technicals'));
     }
 
 

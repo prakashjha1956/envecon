@@ -23,7 +23,8 @@ class TimeProjectsController extends Controller
             return abort(401);
         }
 
-        $time_projects = TimeProject::all();
+
+                $time_projects = TimeProject::all();
 
         return view('admin.time_projects.index', compact('time_projects'));
     }
@@ -108,14 +109,11 @@ class TimeProjectsController extends Controller
         if (! Gate::allows('time_project_view')) {
             return abort(401);
         }
-        $relations = [
-            'request_to_technicals' => \App\RequestToTechnical::where('project_id', $id)->get(),
-            'time_entries' => \App\TimeEntry::where('project_id', $id)->get(),
-        ];
+        $request_to_technicals = \App\RequestToTechnical::where('project_id', $id)->get();$time_entries = \App\TimeEntry::where('project_id', $id)->get();
 
         $time_project = TimeProject::findOrFail($id);
 
-        return view('admin.time_projects.show', compact('time_project') + $relations);
+        return view('admin.time_projects.show', compact('time_project', 'request_to_technicals', 'time_entries'));
     }
 
 

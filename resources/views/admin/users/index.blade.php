@@ -1,3 +1,4 @@
+@inject('request', 'Illuminate\Http\Request')
 @extends('layouts.app')
 
 @section('content')
@@ -8,6 +9,8 @@
         
     </p>
     @endcan
+
+    
 
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -25,7 +28,8 @@
                         <th>@lang('quickadmin.users.fields.name')</th>
                         <th>@lang('quickadmin.users.fields.email')</th>
                         <th>@lang('quickadmin.users.fields.role')</th>
-                        <th>&nbsp;</th>
+                                                <th>&nbsp;</th>
+
                     </tr>
                 </thead>
                 
@@ -37,10 +41,10 @@
                                     <td></td>
                                 @endcan
 
-                                <td>{{ $user->name }}</td>
-                                <td>{{ $user->email }}</td>
-                                <td>{{ $user->role->title or '' }}</td>
-                                <td>
+                                <td field-key='name'>{{ $user->name }}</td>
+                                <td field-key='email'>{{ $user->email }}</td>
+                                <td field-key='role'>{{ $user->role->title or '' }}</td>
+                                                                <td>
                                     @can('user_view')
                                     <a href="{{ route('admin.users.show',[$user->id]) }}" class="btn btn-xs btn-primary">@lang('quickadmin.qa_view')</a>
                                     @endcan
@@ -48,7 +52,7 @@
                                     <a href="{{ route('admin.users.edit',[$user->id]) }}" class="btn btn-xs btn-info">@lang('quickadmin.qa_edit')</a>
                                     @endcan
                                     @can('user_delete')
-                                    {!! Form::open(array(
+{!! Form::open(array(
                                         'style' => 'display: inline-block;',
                                         'method' => 'DELETE',
                                         'onsubmit' => "return confirm('".trans("quickadmin.qa_are_you_sure")."');",
@@ -57,6 +61,7 @@
                                     {!! Form::close() !!}
                                     @endcan
                                 </td>
+
                             </tr>
                         @endforeach
                     @else
